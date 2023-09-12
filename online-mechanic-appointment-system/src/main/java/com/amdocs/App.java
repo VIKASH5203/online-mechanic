@@ -10,6 +10,8 @@ import com.amdocs.dao.impl.AppointmentDaoImpl;
 import com.amdocs.dao.impl.CustomerDaoImpl;
 import com.amdocs.entity.Appointment;
 import com.amdocs.entity.Customer;
+import com.amdocs.exceptions.AppointmentNotFoundException;
+import com.amdocs.exceptions.CustomerNotFoundException;
 
  class App 
 {
@@ -18,12 +20,12 @@ import com.amdocs.entity.Customer;
 	static void showCustomerMenu() throws SQLException {
 		while (true) {
 			System.out.println("\n -----------Enter your choice----------------");
-			System.out.println("\n 1. Register Customer.");
-			System.out.println("\n 2. Modify Customer Details");
-			System.out.println("\n 3. Delete Customer Details");
-			System.out.println("\n 4. View Single record");
-			System.out.println("\n 5. View all Records");
-			System.out.println("\n 6. Exit");
+			System.out.println(" 1. Register Customer.");
+			System.out.println(" 2. Modify Customer Details");
+			System.out.println(" 3. Delete Customer Details");
+			System.out.println(" 4. View Single record");
+			System.out.println(" 5. View all Records");
+			System.out.println(" 6. Exit");
 			
 			int ch = Integer.parseInt(scanner.nextLine());
 
@@ -39,8 +41,14 @@ import com.amdocs.entity.Customer;
 				break;
 			case 3:
 				System.out.println("\n Enter the Id of the Customer to be Deleted.");
-				int id_delete = Integer.parseInt(scanner.nextLine());
-				deleteCustomerRecord(id_delete);
+				int id_delete ;
+				
+				try {
+					id_delete= Integer.parseInt(scanner.nextLine());
+					deleteCustomerRecord(id_delete);
+				} catch (NumberFormatException e) {
+					e.printStackTrace();
+				}
 				break;
 			case 4:
 				System.out.println("\n Enter the Id of the Customer.");
@@ -59,15 +67,15 @@ import com.amdocs.entity.Customer;
 		}
 	}
 
-	static void showAppointmentMenu() throws SQLException {
+	static void showAppointmentMenu() throws SQLException, AppointmentNotFoundException {
 		while (true) {
 			System.out.println("\n -----------Enter your choice----------------");
-			System.out.println("\n 1. Book Appointment.");
-			System.out.println("\n 2. Modify Appointment Details");
-			System.out.println("\n 3. Delete Appointment Details");
-			System.out.println("\n 4. View Single record");
-			System.out.println("\n 5. View all Records");
-			System.out.println("\n 6. Exit");
+			System.out.println(" 1. Book Appointment.");
+			System.out.println(" 2. Modify Appointment Details");
+			System.out.println(" 3. Delete Appointment Details");
+			System.out.println(" 4. View Single record");
+			System.out.println(" 5. View all Records");
+			System.out.println(" 6. Exit");
 			
 			int ch = Integer.parseInt(scanner.nextLine());
 
@@ -106,16 +114,21 @@ import com.amdocs.entity.Customer;
 
 	
 
-	public static void main( String[] args ) throws SQLException
+	public static void main( String[] args ) throws SQLException, AppointmentNotFoundException
     {
     	while (true) {
     		System.out.println("\n -----------Enter your choice----------------");
 			System.out.println(" 1. Customer.");
 			System.out.println(" 2. Mechanic");
-			System.out.println(" 3. Appointment");
-			System.out.println(" 4. Service");
-			System.out.println(" 5. Exit");
-			int ch = Integer.parseInt(scanner.nextLine());
+			System.out.println(" 3. Exit");
+			
+			int ch = 0;
+			
+			try {
+				ch= Integer.parseInt(scanner.nextLine());
+			} catch (NumberFormatException e) {
+				e.printStackTrace();
+			}
 
 			switch (ch) {
 			case 1:
@@ -219,14 +232,28 @@ import com.amdocs.entity.Customer;
 	}
 	
 	private static void viewCustomerWithId(int id) throws SQLException {
-		Customer customer=customerDao.findCustomer(id);
-		System.out.println(customer);
+		Customer customer;
+		try {
+			customer = customerDao.findCustomer(id);
+			System.out.println(customer);
+		} catch (SQLException e) {
+				e.printStackTrace();
+		} catch (CustomerNotFoundException e) {
+			e.printStackTrace();
+		}
 	} 
 	
 	private static void deleteCustomerRecord(int id) throws SQLException{
-		Customer customer=customerDao.findCustomer(id);
-		System.out.println(customer.getFirstName()+"'s record is deleted now");
-		customerDao.deleteCustomerRecord(id);
+		Customer customer;
+		try {
+			customer = customerDao.findCustomer(id);
+			System.out.println(customer.getFirstName()+"'s record is deleted now");
+			customerDao.deleteCustomerRecord(id);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} catch (CustomerNotFoundException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	private static void modifyCustomerDetails(int id, Customer customer) throws SQLException {
@@ -247,9 +274,15 @@ import com.amdocs.entity.Customer;
 		} 	
 	}
 	
-	private static void deleteAppointmentRecord(int appointmentId) {
-		System.out.println("Appointment with id: "+appointmentId+" is deleted");
-		deleteAppointmentRecord(appointmentId);
+	private static void deleteAppointmentRecord(int appointmentId) throws AppointmentNotFoundException, SQLException {
+		try {
+			System.out.println("Appointment with id: "+appointmentId+" is deleted");
+			deleteAppointmentRecord(appointmentId);
+		}catch(SQLException e){
+			e.printStackTrace();
+		} catch (AppointmentNotFoundException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	private static void viewAllAppointmentRecord() throws SQLException {

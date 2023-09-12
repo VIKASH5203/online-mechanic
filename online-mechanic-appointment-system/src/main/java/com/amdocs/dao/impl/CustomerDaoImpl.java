@@ -7,9 +7,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-
 import com.amdocs.dao.CustomerDao;
 import com.amdocs.entity.Customer;
+import com.amdocs.exceptions.CustomerNotFoundException;
 import com.amdocs.util.DBUtil;
 
 public class CustomerDaoImpl implements CustomerDao{
@@ -89,7 +89,7 @@ public class CustomerDaoImpl implements CustomerDao{
 	}
 
 	@Override
-	public Customer findCustomer(int id) throws SQLException {
+	public Customer findCustomer(int id) throws SQLException, CustomerNotFoundException {
 		Customer customer = null;
 	    
 	    // Create the PreparedStatement for finding a customer by ID
@@ -112,6 +112,8 @@ public class CustomerDaoImpl implements CustomerDao{
 	        customer.setPhoneNumber(rs.getString("phone_number"));
 	        customer.setEmailId(rs.getString("email_id"));
 	        customer.setAddress(rs.getString("address"));
+	    }else {
+	    	throw new CustomerNotFoundException("Customer Not Found with given ID"+ id);
 	    }
 	    
 	    // Close the PreparedStatement and ResultSet
